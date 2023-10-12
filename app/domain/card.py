@@ -17,8 +17,13 @@ CardNumber = Annotated[
 ]
 
 
-class Card(Entity):
+class CreateCard(Entity):
     exp_date: ExpirationDate
     holder: Annotated[str, StringConstraints(min_length=2, to_upper=True)]
     cvv: int = Field(ge=100, le=9999)
     number: CardNumber
+
+
+class Card(CreateCard):
+    id: str
+    brand: Annotated[str, StringConstraints(to_upper=True)]

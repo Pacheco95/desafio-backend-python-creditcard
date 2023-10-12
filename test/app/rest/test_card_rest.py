@@ -13,7 +13,7 @@ valid_visa_card = {
     "exp_date": "10/2025",
     "holder": "Fulano da Silva",
     "number": "4220036484096326",
-    "cvv": "606",
+    "cvv": 606,
 }
 
 
@@ -66,3 +66,12 @@ def test_create_card_endpoint_should_fail_invalid_number():
     response = client.post("/card", json=invalid_number)
     assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY, response.text
     assert "Invalid credit card number" in response.text
+
+
+def test_create_card_endpoint_should_succeed():
+    response = client.post("/card", json=valid_visa_card)
+    assert response.status_code == status.HTTP_201_CREATED, response.text
+    holder = valid_visa_card["holder"].upper()
+    expected = {**valid_visa_card, "holder": holder, "brand": "VISA"}
+    assert expected.items() <= response.json().items()
+    assert response.json()["id"]
