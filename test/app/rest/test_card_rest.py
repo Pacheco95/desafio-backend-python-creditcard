@@ -1,6 +1,7 @@
 from datetime import datetime
 from unittest.mock import patch, MagicMock
 
+from bson import ObjectId
 from fastapi.testclient import TestClient
 from starlette import status
 
@@ -79,3 +80,9 @@ def test_create_card_endpoint_should_succeed():
     found_card = find_response.json()
 
     assert created_card == found_card
+
+
+def test_should_not_find_card():
+    nonexistent_id = str(ObjectId())
+    find_response = client.get(f"/card/{nonexistent_id}")
+    assert find_response.status_code == status.HTTP_404_NOT_FOUND, find_response.text
