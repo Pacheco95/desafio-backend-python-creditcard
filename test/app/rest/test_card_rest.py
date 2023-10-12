@@ -11,6 +11,7 @@ from app.utils.datetime import as_utc
 
 client = TestClient(app)
 
+
 @fixture
 def invalid_exp_date_card():
     return {
