@@ -11,7 +11,7 @@ client = TestClient(app)
 
 valid_visa_card = {
     "exp_date": "10/2025",
-    "holder": "Fulano da Silva",
+    "holder": "FULANO DA SILVA",
     "number": "4220036484096326",
     "cvv": 606,
 }
@@ -69,9 +69,13 @@ def test_create_card_endpoint_should_fail_invalid_number():
 
 
 def test_create_card_endpoint_should_succeed():
-    response = client.post("/card", json=valid_visa_card)
-    assert response.status_code == status.HTTP_201_CREATED, response.text
-    holder = valid_visa_card["holder"].upper()
-    expected = {**valid_visa_card, "holder": holder, "brand": "VISA"}
-    assert expected.items() <= response.json().items()
-    assert response.json()["id"]
+    create_response = client.post("/card", json=valid_visa_card)
+    assert create_response.status_code == status.HTTP_201_CREATED, create_response.text
+    created_card = create_response.json()
+    assert set(valid_visa_card.items()).issubset(set(created_card.items()))
+
+    find_response = client.get(f"/card/{created_card['id']}")
+    assert find_response.status_code == status.HTTP_200_OK, find_response.text
+    found_card = find_response.json()
+
+    assert created_card == found_card

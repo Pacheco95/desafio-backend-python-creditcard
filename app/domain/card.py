@@ -3,6 +3,7 @@ from typing_extensions import Annotated
 
 from app.business.validators import validate_card_exp_date, validate_card_number
 from app.domain.entity import Entity
+from app.repository import Storable
 
 ExpirationDate = Annotated[
     str,
@@ -24,6 +25,9 @@ class CreateCard(Entity):
     number: CardNumber
 
 
-class Card(CreateCard):
-    id: str
+class Card(CreateCard, Storable):
+    @classmethod
+    def get_collection(cls) -> str:
+        return "card"
+
     brand: Annotated[str, StringConstraints(to_upper=True)]

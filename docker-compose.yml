@@ -7,4 +7,14 @@ services:
       target: test
     ports:
       - "8000:80"
+    depends_on:
+      - db
+    environment:
+      db_uri: "db"
     entrypoint: [ "uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "80" ]
+
+  db:
+    image: mongo:7
+    restart: always
+    ports:
+      - "28001:27017"
