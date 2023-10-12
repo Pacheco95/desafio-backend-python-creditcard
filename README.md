@@ -1,3 +1,6 @@
+# MaisTODOS backend python challenge
+This is my implementation of the https://github.com/MaisTodos/backend-python-creditcard challenge
+
 ```shell
 # Run API
 docker compose up -d
