@@ -1,7 +1,7 @@
 fastapi>=0.103.2,<0.104.0
 pydantic>=2.4.2,<2.5.0
 uvicorn[standard]>=0.23.0,<0.24.0
-python-creditcard@git+https://github.com/maistodos/python-creditcard.git@main
+python-creditcard@https://github.com/MaisTodos/python-creditcard/archive/refs/tags/v1.0.0.zip
 pymongo>=4.5.0,<4.6.0
 mongodb-migrations>=1.3.0,<1.4.0
 pydantic-settings>=2.0.3,<2.1.0

@@ -10,7 +10,7 @@ services:
     depends_on:
       - db
     environment:
-      db_uri: "db"
+      db_uri: "mongodb://db:27017/default"
     entrypoint: [ "uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "80" ]
 
   db:
