@@ -10,5 +10,5 @@ register_routers(app)
 
 
 @app.get("/", response_class=RedirectResponse, status_code=status.HTTP_308_PERMANENT_REDIRECT)
-def root():
+def redirect_to_docs():
     return "/docs"  # pragma: no cover
