@@ -1,6 +1,7 @@
 from datetime import datetime
 from unittest.mock import patch, MagicMock
 
+import pytest
 from bson import ObjectId
 from fastapi.testclient import TestClient
 from starlette import status
@@ -16,6 +17,13 @@ valid_visa_card = {
     "number": "4220036484096326",
     "cvv": 606,
 }
+
+
+def _cmp_dict(d1: dict, d2: dict, *, ignore=frozenset[str]()):
+    cleaned_d1 = {k: v for k, v in d1.items() if k not in ignore}
+    cleaned_d2 = {k: v for k, v in d2.items() if k not in ignore}
+
+    assert cleaned_d1.items() <= cleaned_d2.items()
 
 
 def test_create_card_endpoint_should_fail_exp_date():
@@ -73,13 +81,14 @@ def test_create_card_endpoint_should_succeed():
     create_response = client.post("/card", json=valid_visa_card)
     assert create_response.status_code == status.HTTP_201_CREATED, create_response.text
     created_card = create_response.json()
-    assert set(valid_visa_card.items()).issubset(set(created_card.items()))
+
+    _cmp_dict(valid_visa_card, created_card, ignore=frozenset({"number"}))
 
     find_response = client.get(f"/card/{created_card['id']}")
     assert find_response.status_code == status.HTTP_200_OK, find_response.text
     found_card = find_response.json()
 
-    assert created_card == found_card
+    _cmp_dict(created_card, found_card, ignore=frozenset({"number"}))
 
 
 def test_should_not_find_card():
@@ -88,6 +97,7 @@ def test_should_not_find_card():
     assert find_response.status_code == status.HTTP_404_NOT_FOUND, find_response.text
 
 
+@pytest.mark.slow
 def test_should_find_all_cards():
     _populate_database(10)
 

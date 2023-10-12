@@ -5,3 +5,4 @@ python-creditcard@git+https://github.com/maistodos/python-creditcard.git@main
 pymongo>=4.5.0,<4.6.0
 mongodb-migrations>=1.3.0,<1.4.0
 pydantic-settings>=2.0.3,<2.1.0
+bcrypt>=4.0.1,<4.1.0

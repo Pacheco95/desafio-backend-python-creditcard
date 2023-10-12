@@ -1,6 +1,7 @@
-from pydantic import StringConstraints, AfterValidator, Field
+from pydantic import StringConstraints, AfterValidator, Field, field_serializer
 from typing_extensions import Annotated
 
+from app.business.security import encrypt_card_number
 from app.business.validators import validate_card_exp_date, validate_card_number
 from app.domain.entity import Entity
 from app.repository import Storable
@@ -31,3 +32,8 @@ class Card(CreateCard, Storable):
         return "card"
 
     brand: Annotated[str, StringConstraints(to_upper=True)]
+    number: str
+
+    @field_serializer("number")
+    def serialize_card_number(self, number: str):
+        return encrypt_card_number(number)

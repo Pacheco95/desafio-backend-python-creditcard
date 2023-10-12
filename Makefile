@@ -12,7 +12,10 @@ clean:
 	@rm -f *.log
 
 test:
-	 coverage run -m pytest && coverage report -m
+	coverage run -m pytest && coverage report -m
+
+test-quick:
+	coverage run -m pytest -v -m "not slow" && coverage report -m
 
 api:
 	uvicorn app.main:app --host 0.0.0.0 --port 8000
