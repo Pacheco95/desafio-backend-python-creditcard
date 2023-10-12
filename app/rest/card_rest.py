@@ -10,8 +10,7 @@ from app.domain.card import Card, CreateCard
 from app.middlewares.auth_middleware import authenticate
 from app.rest.router_tags import RouterTags
 
-# TODO rename to /cards
-router = APIRouter(prefix="/card", tags=[RouterTags.CARD], dependencies=[Depends(authenticate)])
+router = APIRouter(prefix="/cards", tags=[RouterTags.CARD], dependencies=[Depends(authenticate)])
 
 
 @router.post("/", status_code=status.HTTP_201_CREATED, response_model=Card)

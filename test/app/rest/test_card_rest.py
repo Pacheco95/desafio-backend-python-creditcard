@@ -56,7 +56,7 @@ def _cmp_dict(d1: dict, d2: dict, *, ignore=frozenset[str]()):
 
 def test_create_card_endpoint_should_fail_exp_date(auth_headers):
     invalid_exp_date_card = {**valid_visa_card, "exp_date": "99/9999"}
-    response = client.post("/card", json=invalid_exp_date_card, headers=auth_headers)
+    response = client.post("/cards", json=invalid_exp_date_card, headers=auth_headers)
     assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY, response.text
     assert "is not a valid date" in response.text
 
@@ -65,54 +65,54 @@ def test_create_card_endpoint_should_fail_exp_date(auth_headers):
 def test_create_card_endpoint_should_fail_expired(mock_utcnow: MagicMock, auth_headers):
     invalid_exp_date_expired = {**valid_visa_card, "exp_date": "01/3000"}
     mock_utcnow.return_value = as_utc(datetime.fromisoformat("4000-01-01"))
-    response = client.post("/card", json=invalid_exp_date_expired, headers=auth_headers)
+    response = client.post("/cards", json=invalid_exp_date_expired, headers=auth_headers)
     assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY, response.text
     assert "already expired" in response.text
 
 
 def test_create_card_endpoint_should_fail_invalid_holder(auth_headers):
     invalid_holder = {**valid_visa_card, "holder": "?"}
-    response = client.post("/card", json=invalid_holder, headers=auth_headers)
+    response = client.post("/cards", json=invalid_holder, headers=auth_headers)
     assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY, response.text
     assert "at least 2 characters" in response.text
 
 
 def test_create_card_endpoint_should_fail_invalid_cvv_low(auth_headers):
     invalid_cvv = {**valid_visa_card, "cvv": "10"}
-    response = client.post("/card", json=invalid_cvv, headers=auth_headers)
+    response = client.post("/cards", json=invalid_cvv, headers=auth_headers)
     assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY, response.text
     assert "greater than or equal to 100" in response.text
 
 
 def test_create_card_endpoint_should_fail_invalid_cvv_high(auth_headers):
     invalid_cvv = {**valid_visa_card, "cvv": "99999"}
-    response = client.post("/card", json=invalid_cvv, headers=auth_headers)
+    response = client.post("/cards", json=invalid_cvv, headers=auth_headers)
     assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY, response.text
     assert "less than or equal to 9999" in response.text
 
 
 def test_create_card_endpoint_should_fail_invalid_number_format(auth_headers):
     invalid_number = {**valid_visa_card, "number": "not a number"}
-    response = client.post("/card", json=invalid_number, headers=auth_headers)
+    response = client.post("/cards", json=invalid_number, headers=auth_headers)
     assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY, response.text
     assert "should match pattern" in response.text
 
 
 def test_create_card_endpoint_should_fail_invalid_number(auth_headers):
     invalid_number = {**valid_visa_card, "number": "123456"}
-    response = client.post("/card", json=invalid_number, headers=auth_headers)
+    response = client.post("/cards", json=invalid_number, headers=auth_headers)
     assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY, response.text
     assert "Invalid credit card number" in response.text
 
 
 def test_create_card_endpoint_should_succeed(auth_headers):
-    create_response = client.post("/card", json=valid_visa_card, headers=auth_headers)
+    create_response = client.post("/cards", json=valid_visa_card, headers=auth_headers)
     assert create_response.status_code == status.HTTP_201_CREATED, create_response.text
     created_card = create_response.json()
 
     _cmp_dict(valid_visa_card, created_card, ignore=frozenset({"number"}))
 
-    find_response = client.get(f"/card/{created_card['id']}", headers=auth_headers)
+    find_response = client.get(f"/cards/{created_card['id']}", headers=auth_headers)
     assert find_response.status_code == status.HTTP_200_OK, find_response.text
     found_card = find_response.json()
 
@@ -121,7 +121,7 @@ def test_create_card_endpoint_should_succeed(auth_headers):
 
 def test_should_not_find_card(auth_headers):
     nonexistent_id = str(ObjectId())
-    find_response = client.get(f"/card/{nonexistent_id}", headers=auth_headers)
+    find_response = client.get(f"/cards/{nonexistent_id}", headers=auth_headers)
     assert find_response.status_code == status.HTTP_404_NOT_FOUND, find_response.text
 
 
@@ -129,24 +129,24 @@ def test_should_not_find_card(auth_headers):
 def test_should_find_all_cards(auth_headers):
     _populate_database(10, auth_headers)
 
-    response = client.get("card", params={"skip": 0, "limit": 8}, headers=auth_headers)
+    response = client.get("/cards", params={"skip": 0, "limit": 8}, headers=auth_headers)
     assert response.status_code == status.HTTP_200_OK, response.text
     assert len(response.json()) == 8
 
-    response = client.get("card", params={"skip": 8, "limit": 100}, headers=auth_headers)
+    response = client.get("/cards", params={"skip": 8, "limit": 100}, headers=auth_headers)
     assert response.status_code == status.HTTP_200_OK, response.text
     assert len(response.json()) == 2
 
-    response = client.get("card", params={"skip": 10, "limit": 100}, headers=auth_headers)
+    response = client.get("/cards", params={"skip": 10, "limit": 100}, headers=auth_headers)
     assert response.status_code == status.HTTP_200_OK, response.text
     assert len(response.json()) == 0
 
 
 def test_should_fail_to_create_duplicated_cards(auth_headers):
-    response = client.post("/card", json=valid_visa_card, headers=auth_headers)
+    response = client.post("/cards", json=valid_visa_card, headers=auth_headers)
     assert response.status_code == status.HTTP_201_CREATED, response.text
 
-    response = client.post("/card", json=valid_visa_card, headers=auth_headers)
+    response = client.post("/cards", json=valid_visa_card, headers=auth_headers)
     assert response.status_code == status.HTTP_409_CONFLICT, response.text
 
     assert "already exists" in response.text
@@ -155,5 +155,5 @@ def test_should_fail_to_create_duplicated_cards(auth_headers):
 def _populate_database(n: int, auth_headers: dict):
     for i in range(n):
         holder = f"CLIENT-{i}"
-        response = client.post("/card", json={**valid_visa_card, "holder": holder}, headers=auth_headers)
+        response = client.post("/cards", json={**valid_visa_card, "holder": holder}, headers=auth_headers)
         assert response.status_code == status.HTTP_201_CREATED

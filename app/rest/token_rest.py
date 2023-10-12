@@ -35,5 +35,3 @@ def login(form_data: Annotated[OAuth2PasswordRequestForm, Depends()]) -> Token:
         raise unauthorized_exception
 
     return Token(access_token=user.username)
-
-
