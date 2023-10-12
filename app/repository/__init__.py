@@ -1,10 +1,21 @@
 from abc import ABC, abstractmethod
-from functools import cached_property
-from typing import TypeVar, Generic, Type
+from functools import cached_property, cache
+from typing import TypeVar, Generic, Type, Any
 
 from bson import ObjectId
 
 from app.domain.entity import Entity
+
+
+@cache
+def get_database():
+    import pymongo
+    import os
+
+    db_uri = os.getenv("db_uri")
+    database = pymongo.MongoClient(db_uri).get_default_database()
+
+    return database
 
 
 class Storable(ABC, Entity):
@@ -25,11 +36,7 @@ class Repository(Generic[T]):
 
     @cached_property
     def _collection(self):
-        import pymongo
-        import os
-
-        db_uri = os.getenv("db_uri")
-        database = pymongo.MongoClient(db_uri).get_default_database()
+        database = get_database()
         collection = self._model_type.get_collection()
         return database[collection]
 
@@ -41,10 +48,15 @@ class Repository(Generic[T]):
 
     def find_by_id(self, doc_id: str):
         document = self._collection.find_one({"_id": ObjectId(doc_id)})
+        deserialized = self._from_db(document) if document else None
+        return deserialized
 
-        if not document:
-            return None
+    def find_many(self, skip: int, limit: int):
+        documents = self._collection.find({}).skip(skip).limit(limit)
+        deserialized_documents = list(map(self._from_db, documents))
+        return deserialized_documents
 
+    def _from_db(self, document: dict[str, Any]):
         document["id"] = str(document.pop("_id"))
         deserialized = self._model_type.model_validate(document)
         return deserialized

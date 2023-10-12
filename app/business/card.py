@@ -16,3 +16,8 @@ def create_card(card_dto: CreateCard):
 def find_card_by_id(card_id: str):
     found = _repo.find_by_id(card_id)
     return found
+
+
+def find_all_cards(skip: int, limit: int):
+    found = _repo.find_many(skip, limit)
+    return found

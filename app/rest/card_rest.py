@@ -1,8 +1,11 @@
+from typing import Annotated
+
+from fastapi import Query
 from fastapi.routing import APIRouter
 from starlette import status
 from starlette.responses import Response
 
-from app.business.card import create_card, find_card_by_id
+from app.business.card import create_card, find_card_by_id, find_all_cards
 from app.domain.card import Card, CreateCard
 from app.rest.router_tags import RouterTags
 
@@ -15,7 +18,16 @@ def create_card_endpoint(card: CreateCard):
 
 
 @router.get("/{card_id}")
-def create_card_endpoint(card_id: str, response: Response) -> Card | None:
+def find_card_by_id_endpoint(card_id: str, response: Response) -> Card | None:
     found = find_card_by_id(card_id)
     response.status_code = status.HTTP_200_OK if found else status.HTTP_404_NOT_FOUND
     return found if found else None
+
+
+@router.get("/", response_model=list[Card])
+def find_all_cards_by_id_endpoint(
+    skip: Annotated[int, Query(ge=0)] = 0,
+    limit: Annotated[int, Query(ge=0, le=1000)] = 10
+):
+    found = find_all_cards(skip, limit)
+    return found

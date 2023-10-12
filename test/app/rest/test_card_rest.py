@@ -1,11 +1,13 @@
 from datetime import datetime
 from unittest.mock import patch, MagicMock
 
+import pytest
 from bson import ObjectId
 from fastapi.testclient import TestClient
 from starlette import status
 
 from app.main import app
+from app.repository import get_database
 from app.utils.datetime import as_utc
 
 client = TestClient(app)
@@ -16,6 +18,14 @@ valid_visa_card = {
     "number": "4220036484096326",
     "cvv": 606,
 }
+
+
+@pytest.fixture(autouse=True)
+def clear_database():
+    db = get_database()
+
+    for collection in db.list_collection_names():
+        db[collection].drop()
 
 
 def test_create_card_endpoint_should_fail_exp_date():
@@ -86,3 +96,29 @@ def test_should_not_find_card():
     nonexistent_id = str(ObjectId())
     find_response = client.get(f"/card/{nonexistent_id}")
     assert find_response.status_code == status.HTTP_404_NOT_FOUND, find_response.text
+
+
+def test_should_find_all_cards():
+    _populate_database(10)
+
+    response = client.get("card", params={"skip": 0, "limit": 8})
+    assert response.status_code == status.HTTP_200_OK, response.text
+    assert len(response.json()) == 8
+
+    response = client.get("card", params={"skip": 8, "limit": 100})
+    assert response.status_code == status.HTTP_200_OK, response.text
+    assert len(response.json()) == 2
+
+    response = client.get("card", params={"skip": 10, "limit": 100})
+    assert response.status_code == status.HTTP_200_OK, response.text
+    assert len(response.json()) == 0
+
+
+def _populate_database(n: int):
+    responses = [
+        client.post("/card", json={**valid_visa_card, "owner": owner})
+        for i in range(n)
+        if (owner := f"CLIENT-{i}")
+    ]
+
+    assert all(response.status_code == status.HTTP_201_CREATED for response in responses)
