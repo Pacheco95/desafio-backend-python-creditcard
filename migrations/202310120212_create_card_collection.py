@@ -8,9 +8,11 @@ _COLLECTION = "card"
 class Migration(BaseMigration):
 
     def upgrade(self):
+        super().upgrade()
         self.create_collection_if_not_exists(_COLLECTION)
         fields = [("holder", ASCENDING), ("number", ASCENDING), ("cvv", ASCENDING)]
-        self.create_index_if_not_exists(_COLLECTION, fields, unique=True)
+        self.db[_COLLECTION].create_index(fields, unique=True)
 
     def downgrade(self):
+        super().downgrade()
         self.drop_collection_if_exists(_COLLECTION)

@@ -24,7 +24,7 @@ class Storable(ABC, Entity):
     @classmethod
     @abstractmethod
     def get_collection(cls) -> str:
-        ...
+        ...  # pragma: no cover
 
 
 T = TypeVar('T', bound=Storable)
