@@ -1,15 +1,17 @@
 from typing import Annotated
 
-from fastapi import Query
+from fastapi import Query, Depends
 from fastapi.routing import APIRouter
 from starlette import status
 from starlette.responses import Response
 
 from app.business.card import create_card, find_card_by_id, find_all_cards
 from app.domain.card import Card, CreateCard
+from app.middlewares.auth_middleware import authenticate
 from app.rest.router_tags import RouterTags
 
-router = APIRouter(prefix="/card", tags=[RouterTags.CARD])
+# TODO rename to /cards
+router = APIRouter(prefix="/card", tags=[RouterTags.CARD], dependencies=[Depends(authenticate)])
 
 
 @router.post("/", status_code=status.HTTP_201_CREATED, response_model=Card)

@@ -47,10 +47,14 @@ class Repository(Generic[T]):
         new_document = {**serialized, "id": str(result.inserted_id)}
         return self._model_type.model_validate(new_document)
 
-    def find_by_id(self, doc_id: str):
-        document = self._collection.find_one({"_id": ObjectId(doc_id)})
+    def find_one(self, query: dict[str, Any]) -> T | None:
+        document = self._collection.find_one(query)
         deserialized = self._from_db(document) if document else None
         return deserialized
+
+    def find_by_id(self, doc_id: str):
+        found = self.find_one({"_id": ObjectId(doc_id)})
+        return found
 
     def find_many(self, skip: int, limit: int):
         documents = self._collection.find({}).skip(skip).limit(limit)
