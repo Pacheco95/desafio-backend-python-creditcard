@@ -20,10 +20,10 @@ CardNumber = Annotated[
 
 
 class CreateCard(Entity):
-    exp_date: ExpirationDate
-    holder: Annotated[str, StringConstraints(min_length=2, to_upper=True)]
-    cvv: int = Field(ge=100, le=9999)
-    number: CardNumber
+    exp_date: ExpirationDate = Field(..., examples=["01/2028", "12/2033"])
+    holder: Annotated[str, StringConstraints(min_length=2, to_upper=True)] = Field(..., examples=["Fulano da Silva"])
+    cvv: int = Field(ge=100, le=9999, examples=[100, 9999])
+    number: CardNumber = Field(..., examples=["4220036484096326", "4220 0364 8409 6326"])
 
 
 class Card(CreateCard, Storable):
@@ -31,8 +31,8 @@ class Card(CreateCard, Storable):
     def get_collection(cls) -> str:
         return "card"
 
-    brand: Annotated[str, StringConstraints(to_upper=True)]
-    number: str
+    brand: Annotated[str, StringConstraints(to_upper=True)] = Field(..., examples=["VISA", "ELO"])
+    number: str = Field(..., examples=["<encrypted>"])
 
     @field_serializer("number")
     def serialize_card_number(self, number: str):

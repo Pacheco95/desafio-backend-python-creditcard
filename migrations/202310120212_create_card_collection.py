@@ -10,7 +10,7 @@ class Migration(BaseMigration):
     def upgrade(self):
         super().upgrade()
         self.create_collection_if_not_exists(_COLLECTION)
-        fields = [("holder", ASCENDING), ("number", ASCENDING), ("cvv", ASCENDING)]
+        fields = [("holder", ASCENDING), ("exp_date", ASCENDING), ("cvv", ASCENDING)]
         self.db[_COLLECTION].create_index(fields, unique=True)
 
     def downgrade(self):

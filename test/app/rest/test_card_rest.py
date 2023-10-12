@@ -114,6 +114,16 @@ def test_should_find_all_cards():
     assert len(response.json()) == 0
 
 
+def test_should_fail_to_create_duplicated_cards():
+    response = client.post("/card", json=valid_visa_card)
+    assert response.status_code == status.HTTP_201_CREATED, response.text
+
+    response = client.post("/card", json=valid_visa_card)
+    assert response.status_code == status.HTTP_409_CONFLICT, response.text
+
+    assert "already exists" in response.text
+
+
 def _populate_database(n: int):
     for i in range(n):
         holder = f"CLIENT-{i}"

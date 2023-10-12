@@ -3,6 +3,7 @@ from functools import cached_property, cache
 from typing import TypeVar, Generic, Type, Any
 
 from bson import ObjectId
+from pydantic import Field
 
 from app.config.app_config import AppConfig
 from app.domain.entity import Entity
@@ -19,7 +20,7 @@ def get_database():
 
 
 class Storable(ABC, Entity):
-    id: str = ""
+    id: str = Field("", examples=["65279820aa60482099e67693"])
 
     @classmethod
     @abstractmethod
