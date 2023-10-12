@@ -5,6 +5,7 @@ import bcrypt
 import pytest
 from bson import ObjectId
 from fastapi.testclient import TestClient
+from httpx import Response
 from starlette import status
 
 from app.main import app
@@ -45,6 +46,24 @@ def make_encrypt_faster():
         encrypt_pwd.side_effect = quicker_encrypt
         encrypt_card.side_effect = quicker_encrypt
         yield
+
+
+@pytest.mark.parametrize("response", [
+    client.get("/cards"),
+    client.get("/cards/123"),
+    client.post("/cards"),
+])
+def test_should_fail_unauthorized_missing_headers(response: Response):
+    assert response.status_code == status.HTTP_401_UNAUTHORIZED, response.text
+
+
+@pytest.mark.parametrize("response", [
+    client.get("/cards", headers={"Authorization": "Bearer invalid_token"}),
+    client.get("/cards/123", headers={"Authorization": "Bearer invalid_token"}),
+    client.post("/cards", headers={"Authorization": "Bearer invalid_token"}),
+])
+def test_should_fail_unauthorized_invalid_credentials(response: Response):
+    assert response.status_code == status.HTTP_401_UNAUTHORIZED, response.text
 
 
 def test_create_card_endpoint_should_fail_exp_date(auth_headers):
