@@ -66,6 +66,20 @@ def test_should_fail_unauthorized_invalid_credentials(response: Response):
     assert response.status_code == status.HTTP_401_UNAUTHORIZED, response.text
 
 
+def test_should_fail_attempt_to_login_with_nonexistent_user():
+    user = dict(username="no-one", password="irrelevant")
+    response = client.post("/token", data=user)
+    assert response.status_code == status.HTTP_401_UNAUTHORIZED, response.text
+
+
+def test_should_fail_attempt_to_login_with_invalid_password():
+    user = dict(username="admin", password="admin")
+    assert client.post("/users", json=user).status_code == status.HTTP_201_CREATED
+
+    response = client.post("/token", data=dict(username="admin", password="wrong"))
+    assert response.status_code == status.HTTP_401_UNAUTHORIZED, response.text
+
+
 def test_create_card_endpoint_should_fail_exp_date(auth_headers):
     invalid_exp_date_card = {**valid_visa_card, "exp_date": "99/9999"}
     response = client.post("/cards", json=invalid_exp_date_card, headers=auth_headers)
