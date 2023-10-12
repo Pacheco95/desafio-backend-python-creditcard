@@ -47,13 +47,6 @@ def make_encrypt_faster():
         yield
 
 
-def _cmp_dict(d1: dict, d2: dict, *, ignore=frozenset[str]()):
-    cleaned_d1 = {k: v for k, v in d1.items() if k not in ignore}
-    cleaned_d2 = {k: v for k, v in d2.items() if k not in ignore}
-
-    assert cleaned_d1.items() <= cleaned_d2.items()
-
-
 def test_create_card_endpoint_should_fail_exp_date(auth_headers):
     invalid_exp_date_card = {**valid_visa_card, "exp_date": "99/9999"}
     response = client.post("/cards", json=invalid_exp_date_card, headers=auth_headers)
@@ -157,3 +150,10 @@ def _populate_database(n: int, auth_headers: dict):
         holder = f"CLIENT-{i}"
         response = client.post("/cards", json={**valid_visa_card, "holder": holder}, headers=auth_headers)
         assert response.status_code == status.HTTP_201_CREATED
+
+
+def _cmp_dict(d1: dict, d2: dict, *, ignore=frozenset[str]()):
+    cleaned_d1 = {k: v for k, v in d1.items() if k not in ignore}
+    cleaned_d2 = {k: v for k, v in d2.items() if k not in ignore}
+
+    assert cleaned_d1.items() <= cleaned_d2.items()
