@@ -6,10 +6,11 @@ from app.domain.entity import Entity
 
 ExpirationDate = Annotated[
     str,
-    StringConstraints(to_upper=True, pattern=r"\d{2}/\d{4}"),
+    StringConstraints(pattern=r"\d{2}/\d{4}"),
     AfterValidator(validate_card_exp_date)
 ]
 
 
 class Card(Entity):
     exp_date: ExpirationDate
+    holder: Annotated[str, StringConstraints(min_length=2, to_upper=True)]

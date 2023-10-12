@@ -13,20 +13,36 @@ client = TestClient(app)
 
 
 @fixture
-def invalid_exp_date_card():
+def valid_visa_card():
     return {
-        "exp_date": "13/2026",
-        "holder": "Fulano",
-        "number": "0000000000000001",
-        "cvv": "123",
+        "exp_date": "10/2025",
+        "holder": "Fulano da Silva",
+        "number": "4220036484096326",
+        "cvv": "606",
     }
 
 
 @fixture
-def invalid_exp_date_expired(invalid_exp_date_card):
+def invalid_exp_date_card(valid_visa_card):
     return {
-        **invalid_exp_date_card,
+        **valid_visa_card,
+        "exp_date": "99/9999",
+    }
+
+
+@fixture
+def invalid_exp_date_expired(valid_visa_card):
+    return {
+        **valid_visa_card,
         "exp_date": "01/3000",
+    }
+
+
+@fixture
+def invalid_holder(valid_visa_card):
+    return {
+        **valid_visa_card,
+        "holder": "?",
     }
 
 
@@ -42,3 +58,9 @@ def test_create_card_endpoint_should_fail_expired(mock_utcnow: MagicMock, invali
     response = client.post("/card", json=invalid_exp_date_expired)
     assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY, response.text
     assert re.match(r".*already expired.*", response.text)
+
+
+def test_create_card_endpoint_should_fail_invalid_holder(invalid_holder):
+    response = client.post("/card", json=invalid_holder)
+    assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY, response.text
+    assert re.match(r".*at least 2 characters.*", response.text)
