@@ -38,3 +38,17 @@ def test_create_card_endpoint_should_fail_invalid_holder():
     response = client.post("/card", json=invalid_holder)
     assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY, response.text
     assert "at least 2 characters" in response.text
+
+
+def test_create_card_endpoint_should_fail_invalid_cvv_low():
+    invalid_cvv = {**valid_visa_card, "cvv": "10"}
+    response = client.post("/card", json=invalid_cvv)
+    assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY, response.text
+    assert "greater than or equal to 100" in response.text
+
+
+def test_create_card_endpoint_should_fail_invalid_cvv_high():
+    invalid_cvv = {**valid_visa_card, "cvv": "99999"}
+    response = client.post("/card", json=invalid_cvv)
+    assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY, response.text
+    assert "less than or equal to 9999" in response.text
