@@ -1,5 +1,7 @@
 from datetime import datetime
 
+from creditcard import CreditCard
+
 from app.utils.datetime import utcnow
 
 
@@ -16,3 +18,12 @@ def validate_card_exp_date(exp: str):
         raise ValueError(f'The expiration date "{exp}" is already expired')
 
     return exp
+
+
+def validate_card_number(number: str):
+    card = CreditCard(number)
+
+    if not card.is_valid():
+        raise ValueError(f'Invalid credit card number "{number}"')
+
+    return number

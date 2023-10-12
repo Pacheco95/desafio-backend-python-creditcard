@@ -52,3 +52,17 @@ def test_create_card_endpoint_should_fail_invalid_cvv_high():
     response = client.post("/card", json=invalid_cvv)
     assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY, response.text
     assert "less than or equal to 9999" in response.text
+
+
+def test_create_card_endpoint_should_fail_invalid_number_format():
+    invalid_number = {**valid_visa_card, "number": "not a number"}
+    response = client.post("/card", json=invalid_number)
+    assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY, response.text
+    assert "should match pattern" in response.text
+
+
+def test_create_card_endpoint_should_fail_invalid_number():
+    invalid_number = {**valid_visa_card, "number": "123456"}
+    response = client.post("/card", json=invalid_number)
+    assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY, response.text
+    assert "Invalid credit card number" in response.text
