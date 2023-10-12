@@ -4,16 +4,16 @@ from typing import TypeVar, Generic, Type, Any
 
 from bson import ObjectId
 
+from app.config.app_config import AppConfig
 from app.domain.entity import Entity
 
 
 @cache
 def get_database():
     import pymongo
-    import os
 
-    db_uri = os.getenv("db_uri")
-    database = pymongo.MongoClient(db_uri).get_default_database()
+    app_config = AppConfig()
+    database = pymongo.MongoClient(app_config.db_uri).get_default_database()
 
     return database
 

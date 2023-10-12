@@ -1,13 +1,11 @@
 from datetime import datetime
 from unittest.mock import patch, MagicMock
 
-import pytest
 from bson import ObjectId
 from fastapi.testclient import TestClient
 from starlette import status
 
 from app.main import app
-from app.repository import get_database
 from app.utils.datetime import as_utc
 
 client = TestClient(app)
@@ -18,14 +16,6 @@ valid_visa_card = {
     "number": "4220036484096326",
     "cvv": 606,
 }
-
-
-@pytest.fixture(autouse=True)
-def clear_database():
-    db = get_database()
-
-    for collection in db.list_collection_names():
-        db[collection].drop()
 
 
 def test_create_card_endpoint_should_fail_exp_date():
@@ -115,10 +105,7 @@ def test_should_find_all_cards():
 
 
 def _populate_database(n: int):
-    responses = [
-        client.post("/card", json={**valid_visa_card, "owner": owner})
-        for i in range(n)
-        if (owner := f"CLIENT-{i}")
-    ]
-
-    assert all(response.status_code == status.HTTP_201_CREATED for response in responses)
+    for i in range(n):
+        holder = f"CLIENT-{i}"
+        response = client.post("/card", json={**valid_visa_card, "holder": holder})
+        assert response.status_code == status.HTTP_201_CREATED
