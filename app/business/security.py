@@ -8,9 +8,10 @@ from passlib.context import CryptContext
 from pydantic import BaseModel
 from starlette import status
 
+from app.config.app_config import AppConfig
 from app.utils.datetime import utcnow
 
-SECRET_KEY = "6b7d5bc2b70ec0cd4355bb51b2d9512d686860c2e2054bd049fe0988e3c54ef6"
+SECRET_KEY = AppConfig().jwt_secret
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
 

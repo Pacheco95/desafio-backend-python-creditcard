@@ -3,8 +3,13 @@
 This is my implementation of the https://github.com/MaisTodos/backend-python-creditcard challenge
 
 ```shell
+# Setup environment variables
+cp env/.env.testing-compose .env
+
 # Run API
-docker compose up -d
+docker compose up
+
+# Open another terminal session
 
 # Run tests
 docker compose exec api make test
