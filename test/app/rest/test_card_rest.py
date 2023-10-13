@@ -20,14 +20,15 @@ valid_visa_card = {
     "cvv": 606,
 }
 
+fake_user = dict(username="admin", password="admin")
+
 
 @pytest.fixture
 def auth_headers():
-    user = dict(username="admin", password="admin")
-    response = client.post("/users", json=user)
+    response = client.post("/users", json=fake_user)
     assert response.status_code == status.HTTP_201_CREATED, response.text
 
-    response = client.post("/token", data=user)
+    response = client.post("/token", data=fake_user)
     assert response.status_code == status.HTTP_200_OK, response.text
     token = response.json()["access_token"]
     return {"Authorization": f"Bearer {token}"}
@@ -131,18 +132,21 @@ def test_create_card_endpoint_should_fail_invalid_number(auth_headers):
     assert "Invalid credit card number" in response.text
 
 
-def test_create_card_endpoint_should_succeed(auth_headers):
+def test_card_is_stored_in_database(auth_headers):
     create_response = client.post("/cards", json=valid_visa_card, headers=auth_headers)
     assert create_response.status_code == status.HTTP_201_CREATED, create_response.text
     created_card = create_response.json()
+    assert created_card["created_by"] == fake_user["username"]
 
-    _cmp_dict(valid_visa_card, created_card, ignore=frozenset({"number"}))
+    ignore = frozenset({"number", "created_at"})
+
+    _cmp_dict(valid_visa_card, created_card, ignore=ignore)
 
     find_response = client.get(f"/cards/{created_card['id']}", headers=auth_headers)
     assert find_response.status_code == status.HTTP_200_OK, find_response.text
     found_card = find_response.json()
 
-    _cmp_dict(created_card, found_card, ignore=frozenset({"number"}))
+    _cmp_dict(created_card, found_card, ignore=ignore)
 
 
 def test_should_not_find_card(auth_headers):

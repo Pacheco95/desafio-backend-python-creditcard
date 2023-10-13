@@ -4,7 +4,7 @@ from typing_extensions import Annotated
 from app.business.security import encrypt
 from app.business.validators import validate_card_exp_date, validate_card_number
 from app.domain.entity import Entity
-from app.repository import Storable
+from app.repository import Storable, Auditable
 
 ExpirationDate = Annotated[
     str,
@@ -26,7 +26,7 @@ class CreateCard(Entity):
     number: CardNumber = Field(..., examples=["4220036484096326", "4220 0364 8409 6326"])
 
 
-class Card(CreateCard, Storable):
+class Card(CreateCard, Storable, Auditable):
     @classmethod
     def get_collection(cls) -> str:
         return "cards"

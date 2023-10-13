@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+from datetime import datetime
 from functools import cached_property, cache
 from typing import TypeVar, Generic, Type, Any
 
@@ -7,6 +8,7 @@ from pydantic import Field
 
 from app.config.app_config import AppConfig
 from app.domain.entity import Entity
+from app.utils.datetime import utcnow
 
 
 @cache
@@ -26,6 +28,11 @@ class Storable(ABC, Entity):
     @abstractmethod
     def get_collection(cls) -> str:
         ...  # pragma: no cover
+
+
+class Auditable(Entity):
+    created_at: datetime = Field(default_factory=utcnow)
+    created_by: str
 
 
 T = TypeVar('T', bound=Storable)
