@@ -95,3 +95,4 @@ I would probably use an external Keycloak server for those.
 - Indexed audit fields `created_at` and `created_by` for cards.
 - Paginated search for cards
 - Migrations to create collections and indexes
+- GitHub actions to run tests 
