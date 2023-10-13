@@ -2,24 +2,62 @@
 
 This is my implementation of the https://github.com/MaisTodos/backend-python-creditcard challenge
 
+# Requirements
+
+[Docker engine](https://docs.docker.com/engine/)
+
+# Usage
+
+Start application
+
 ```shell
+# In terminal 1
 # Setup environment variables
 cp env/.env.testing-compose .env
 
 # Run API
 docker compose up
 
-# Open another terminal session
+# Keep terminal 1 open
+```
 
-# Run tests
+Run tests
+
+```shell
+# In terminal 2
 docker compose exec api make test
+```
 
-# Stop
-docker compose stop
+Stop application
 
-# Cleanup
+```shell
+# Ctrl-C on terminal 1 OR
+docker compose stop # On terminal 2
+```
+
+Cleanup
+
+```shell
 docker compose down
 ```
+
+# Interact with the API via Swagger
+
+1. Create a user to access the protected endpoints
+   1. Access [http://0.0.0.0:8000/docs#/Users/create_user_endpoint_users__post](http://0.0.0.0:8000/docs#/Users/create_user_endpoint_users__post)
+   2. Click `Try it out`
+   3. Paste `{ "username": "admin", "password": "admin" }` under `Request body` input
+   4. Click `Execute`
+2. Get authentication to access the endpoints:
+   1. Go to page top
+   2. Click `Authorize`
+   3. Type `admin` in both `username` and `password` inputs
+   4. Click `Authorize` and then `Close`
+   5. Your authentication is set
+3. Choose any Card endpoint to play with, for instance [List Cards](http://0.0.0.0:8000/docs#/Card/find_all_cards_by_id_endpoint_cards__get)
+   1. Since there is no card created it will return an empty array
+   2. Try to create different cards using the `POST` endpoint
+   3. Try to create invalid cards bypassing the validations. TIP: go to page end and look for `CreateCard` under `Schemas`
 
 # Decisions made
 
