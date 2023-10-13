@@ -15,4 +15,4 @@ class User(BaseUser, Storable):
 
     @classmethod
     def get_collection(cls) -> str:
-        return "user"
+        return "users"

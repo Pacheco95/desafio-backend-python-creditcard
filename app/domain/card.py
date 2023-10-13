@@ -29,7 +29,7 @@ class CreateCard(Entity):
 class Card(CreateCard, Storable):
     @classmethod
     def get_collection(cls) -> str:
-        return "card"
+        return "cards"
 
     brand: Annotated[str, StringConstraints(to_upper=True)] = Field(..., examples=["VISA", "ELO"])
     number: str = Field(..., examples=["<encrypted>"])
