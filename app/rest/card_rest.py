@@ -6,11 +6,11 @@ from starlette import status
 from starlette.responses import Response
 
 from app.business.card import create_card, find_card_by_id, find_all_cards
+from app.business.security import get_current_user
 from app.domain.card import Card, CreateCard
-from app.middlewares.auth_middleware import authenticate
 from app.rest.router_tags import RouterTags
 
-router = APIRouter(prefix="/cards", tags=[RouterTags.CARD], dependencies=[Depends(authenticate)])
+router = APIRouter(prefix="/cards", tags=[RouterTags.CARD], dependencies=[Depends(get_current_user)])
 
 
 @router.post("/", status_code=status.HTTP_201_CREATED, response_model=Card)

@@ -9,4 +9,5 @@ def as_utc(dt: datetime):
 
 
 def utcnow():
-    return as_utc(datetime.now())
+    now = datetime.utcnow()
+    return as_utc(now)
