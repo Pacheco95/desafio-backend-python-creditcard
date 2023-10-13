@@ -1,4 +1,4 @@
-name: FastAPI application
+name: Tests
 
 on:
   push:
@@ -20,11 +20,11 @@ jobs:
       run: |
         cp env/.env.testing-compose .env
         docker compose up -d
-    
+
     - name: Run tests
       run: |
         docker compose exec api make test
-    
+
     - name: Cleanup
       run: |
         docker compose down

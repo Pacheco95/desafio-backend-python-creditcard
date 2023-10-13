@@ -2,6 +2,8 @@
 
 This is my implementation of the https://github.com/MaisTodos/backend-python-creditcard challenge
 
+![Build status](https://github.com/Pacheco95/desafio-backend-python-creditcard/actions/workflows/python-app.yml/badge.svg)
+
 # Requirements
 
 [Docker engine](https://docs.docker.com/engine/)
